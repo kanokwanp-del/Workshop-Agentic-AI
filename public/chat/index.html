@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f97316" />
+  <title>AI Desk | สนทนากับ AI</title>
+  <style>
+    :root { --orange: #f97316; --orange-dark: #c2410c; --ink: #2b211c; --muted: #806e63; --line: #f1d8c6; --cream: #fff7ed; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--cream); }
+    .app { display: flex; width: min(980px, 100%); height: 100vh; min-height: 560px; flex-direction: column; margin: auto; background: #fffdfb; box-shadow: 0 0 40px #c2410c12; }
+    .top { padding: 22px clamp(18px, 4vw, 40px) 18px; border-bottom: 1px solid var(--line); background: #fff; }
+    .back { color: var(--muted); font-size: .9rem; text-decoration: none; }
+    .back:hover, .back:focus-visible { color: var(--orange-dark); }
+    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
+    h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); letter-spacing: -.03em; }
+    .status { display: inline-flex; align-items: center; gap: 7px; color: #15803d; font-size: .82rem; font-weight: 700; white-space: nowrap; }
+    .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    .field { display: flex; min-width: 180px; flex: 1; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: .78rem; font-weight: 700; }
+    .controls select, .controls input { width: 100%; padding: 10px 12px; color: var(--ink); font: inherit; background: #fffaf6; border: 1px solid #e8cbb8; border-radius: 11px; }
+    .controls select:focus, .controls input:focus, textarea:focus { border-color: var(--orange); outline: 3px solid #fed7aa; outline-offset: 1px; }
+    .messages { flex: 1; overflow: auto; padding: clamp(20px, 4vw, 38px); scroll-behavior: smooth; }
+    .empty { max-width: 490px; margin: 9vh auto 0; text-align: center; }
+    .empty-icon { display: grid; width: 58px; height: 58px; margin: 0 auto 18px; place-items: center; color: #fff; font-size: 1.5rem; background: var(--orange); border-radius: 18px; }
+    .empty h2 { margin: 0 0 8px; font-size: 1.35rem; }
+    .empty p { margin: 0; color: var(--muted); line-height: 1.7; }
+    .bubble { max-width: min(76%, 680px); padding: 13px 17px; margin: 12px 0; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 18px; }
+    .user { margin-left: auto; color: #fff; background: linear-gradient(135deg, #fb923c, #ea580c); border-bottom-right-radius: 5px; }
+    .assistant { background: #fff; border: 1px solid var(--line); border-bottom-left-radius: 5px; }
+    .typing { color: var(--muted); font-size: .9rem; font-style: italic; }
+    .form { display: flex; align-items: flex-end; gap: 12px; padding: 18px clamp(18px, 4vw, 40px) 22px; background: #fff; border-top: 1px solid var(--line); }
+    .form textarea { flex: 1; min-height: 48px; max-height: 150px; resize: none; padding: 13px 15px; color: var(--ink); font: inherit; line-height: 1.45; background: #fffaf6; border: 1px solid #e8cbb8; border-radius: 14px; }
+    .form button { min-height: 48px; padding: 0 20px; color: #fff; font: inherit; font-weight: 750; background: var(--orange); border: 0; border-radius: 14px; cursor: pointer; box-shadow: 0 8px 18px #f9731640; }
+    .form button:hover, .form button:focus-visible { background: var(--orange-dark); }
+    .form button:disabled { cursor: wait; opacity: .55; }
+    .hint { margin: 8px 0; color: #a38b7d; font-size: .75rem; text-align: right; padding-inline: clamp(18px, 4vw, 40px); }
+    @media (max-width: 560px) { .app { min-height: 100vh; } .title-row { align-items: flex-start; flex-direction: column; gap: 8px; } .bubble { max-width: 88%; } .form { flex-direction: column; align-items: stretch; } .form button { width: 100%; } .hint { display: none; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <a class="back" href="/">← กลับหน้าหลัก</a>
+      <div class="title-row"><h1>สนทนากับ AI</h1><span class="status">พร้อมใช้งาน</span></div>
+      <div class="controls" aria-label="การตั้งค่าการสนทนา">
+        <div class="field"><label for="provider">ผู้ให้บริการ</label><select id="provider"><option value="gemini">Google Gemini</option><option value="openai">OpenAI</option><option value="openai-compat">Custom gateway</option></select></div>
+        <div class="field"><label for="model">โมเดล</label><input id="model" value="gemini-flash-latest" autocomplete="off" /></div>
+      </div>
+    </header>
+    <section id="messages" class="messages" aria-live="polite">
+      <div id="empty" class="empty"><div class="empty-icon" aria-hidden="true">✦</div><h2>วันนี้อยากให้ช่วยเรื่องอะไร?</h2><p>พิมพ์คำถามหรือไอเดียของคุณด้านล่างได้เลย AI Desk พร้อมช่วยคิดและตอบคำถาม</p></div>
+    </section>
+    <form id="form" class="form">
+      <textarea id="input" rows="1" placeholder="พิมพ์ข้อความของคุณ..." aria-label="ข้อความที่ต้องการส่ง"></textarea>
+      <button type="submit">ส่งข้อความ <span aria-hidden="true">→</span></button>
+    </form>
+    <p class="hint">กด Enter เพื่อส่ง · Shift + Enter เพื่อขึ้นบรรทัดใหม่</p>
+  </main>
+  <script src="/chat/app.js"></script>
+</body>
+</html>

@@ -7,5 +7,8 @@ export function route(request: Request, env: Env, ctx?: ExecutionContext): Promi
   if (url.pathname === '/healthz') return Promise.resolve(json({ ok: true }));
   if (url.pathname === '/api/chat') return handleChatRoute(request, env);
   if (url.pathname.startsWith('/api/')) return Promise.resolve(errorJson('ไม่พบ API endpoint นี้', 404));
+  if (url.pathname === '/chat' || url.pathname === '/chat/') {
+    return env.ASSETS.fetch(new Request(new URL('/chat/index.html', request.url), request));
+  }
   return env.ASSETS.fetch(request);
 }
